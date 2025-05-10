@@ -2,7 +2,11 @@ pipeline {
     agent any
 
     triggers {
-        pollSCM('H/5 * * * *') 
+        pollSCM('H/5 * * * *')
+    }
+
+    environment {
+        EMAIL_RECIPIENT = 'teddyhiny@gmail.com'
     }
 
     stages {
@@ -15,8 +19,22 @@ pipeline {
 
         stage('Unit and Integration Tests') {
             steps {
-                echo 'Stage 2: Unit and Integration Tests – Run unit and integration tests.'
-                echo 'Tools: Jest'
+                script {
+                    echo 'Stage 2: Unit and Integration Tests – Run unit and integration tests.'
+                    echo 'Tools: Jest'
+                    // Simulate test step
+                    sh 'echo "Running Jest tests..."'
+                }
+            }
+            post {
+                always {
+                    emailext(
+                        subject: "Jenkins Job - Unit and Integration Tests: ${currentBuild.result}",
+                        body: "The 'Unit and Integration Tests' stage has completed with status: ${currentBuild.result}",
+                        to: "${EMAIL_RECIPIENT}",
+                        attachLog: true
+                    )
+                }
             }
         }
 
@@ -29,8 +47,22 @@ pipeline {
 
         stage('Security Scan') {
             steps {
-                echo 'Stage 4: Security Scan – Scan for known vulnerabilities in dependencies.'
-                echo 'Tool: npm audit'
+                script {
+                    echo 'Stage 4: Security Scan – Scan for known vulnerabilities in dependencies.'
+                    echo 'Tool: npm audit'
+                    // Simulate audit
+                    sh 'echo "Running npm audit..."'
+                }
+            }
+            post {
+                always {
+                    emailext(
+                        subject: "Jenkins Job - Security Scan: ${currentBuild.result}",
+                        body: "The 'Security Scan' stage has completed with status: ${currentBuild.result}",
+                        to: "${EMAIL_RECIPIENT}",
+                        attachLog: true
+                    )
+                }
             }
         }
 
